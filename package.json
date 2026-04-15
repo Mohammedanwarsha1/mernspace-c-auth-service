@@ -1,19 +1,25 @@
 {
-  "name": "auth-service",
-  "version": "1.0.0",
-  "description": "The user management service",
-  "main": "index.js",
-  "scripts": {
-    "dev": "node src/server.js",
-    "format:fix": "prettier . --write",
-    "format:check": "prettier . --check",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "Anwar shah <mohammedanwarsha2019@gmail.com>",
-  "license": "ISC",
-  "devDependencies": {
-    "@types/node": "^25.6.0",
-    "prettier": "3.8.2",
-    "typescript": "^6.0.2"
-  }
+    "name": "auth-service",
+    "version": "1.0.0",
+    "description": "The user management service",
+    "main": "index.js",
+    "scripts": {
+        "dev": "node src/server.js",
+        "format:fix": "prettier . --write",
+        "format:check": "prettier . --check",
+        "lint:check": "eslint .",
+        "lint:fix": "eslint . --fix",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "Anwar shah <mohammedanwarsha2019@gmail.com>",
+    "license": "ISC",
+    "devDependencies": {
+        "@eslint/js": "^9.39.4",
+        "@types/eslint__js": "^8.42.3",
+        "@types/node": "^25.6.0",
+        "eslint": "^9.39.4",
+        "prettier": "3.8.2",
+        "typescript": "^6.0.2",
+        "typescript-eslint": "^8.58.2"
+    }
 }
