@@ -7,7 +7,6 @@ import logger from "./config/logger.js";
 import type { HttpError } from "http-errors";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { error } from "node:console";
-import createHttpError from "http-errors";
 const app = express();
 
 app.get("/", async (req, res) => {

@@ -5,12 +5,12 @@
     "description": "The user management service",
     "main": "index.js",
     "scripts": {
-        "dev": "nodemon --watch src --ext ts,json --exec tsx src/server.ts",
+        "dev": "nodemon --legacy-watch --watch src --ext ts,json --exec tsx src/server.ts",
         "format:fix": "prettier . --write",
         "format:check": "prettier . --check",
         "lint:check": "eslint .",
         "lint:fix": "eslint . --fix",
-        "test": "jest --watch --runInBand",
+        "test": "jest --watch",
         "prepare": "husky"
     },
     "author": "Anwar shah <mohammedanwarsha2019@gmail.com>",

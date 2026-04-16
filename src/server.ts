@@ -6,6 +6,7 @@ const startServer = () => {
     const PORT = Config.PORT;
     try {
         app.listen(PORT, () => {
+            console.log("welcome hi");
             logger.info("liserning on port", { port: PORT });
         });
     } catch (err) {
