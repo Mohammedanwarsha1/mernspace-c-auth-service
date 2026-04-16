@@ -1,8 +1,36 @@
-import express from "express";
+import express, {
+    type NextFunction,
+    type Request,
+    type Response,
+} from "express";
+import logger from "./config/logger.js";
+import type { HttpError } from "http-errors";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { error } from "node:console";
+import createHttpError from "http-errors";
 const app = express();
 
-app.get("/", (req, res) => {
-    res.send("Welcome to auth service");
+app.get("/", async (req, res, next) => {
+    const err = createHttpError(401, "You cannot access the route");
+    next(err);
+    //res.send("Welcome to auth service");
+});
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {
+    logger.error(err.message);
+    const statusCode = err.statusCode || 500;
+
+    res.status(statusCode).json({
+        errors: [
+            {
+                type: err.name,
+                msg: err.message,
+                path: "",
+                location: "",
+            },
+        ],
+    });
 });
 
 export default app;
