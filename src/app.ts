@@ -10,12 +10,11 @@ import { error } from "node:console";
 import createHttpError from "http-errors";
 const app = express();
 
-app.get("/", async (req, res, next) => {
-    const err = createHttpError(401, "You cannot access the route");
-    next(err);
-    //res.send("Welcome to auth service");
+app.get("/", async (req, res) => {
+    res.send("Welcome to auth service");
 });
 
+// Global Error Handler
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {
     logger.error(err.message);
