@@ -7,11 +7,14 @@ import logger from "./config/logger.js";
 import type { HttpError } from "http-errors";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { error } from "node:console";
+import authRouter from "./routes/auth";
 const app = express();
 
 app.get("/", async (req, res) => {
     res.send("Welcome to auth service");
 });
+
+app.use("/auth", authRouter);
 
 // Global Error Handler
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

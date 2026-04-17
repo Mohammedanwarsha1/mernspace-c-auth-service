@@ -1,6 +1,7 @@
 /** @type {import('jest').Config} */
 export default {
     testEnvironment: "node",
+    verbose: true,
     extensionsToTreatAsEsm: [".ts"],
     watchPathIgnorePatterns: [
         "<rootDir>/.git/",
