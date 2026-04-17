@@ -5,7 +5,7 @@
     "description": "The user management service",
     "main": "index.js",
     "scripts": {
-        "dev": "nodemon --legacy-watch --watch src --ext ts,json --exec tsx src/server.ts",
+        "dev": "cross-env NODE_ENV=dev nodemon --legacy-watch --watch src --ext ts,json --exec tsx src/server.ts",
         "format:fix": "prettier . --write",
         "format:check": "prettier . --check",
         "lint:check": "eslint .",
@@ -33,6 +33,7 @@
         "prettier": "3.8.2",
         "supertest": "^7.2.2",
         "ts-jest": "^29.4.9",
+        "ts-node": "^10.9.2",
         "tsx": "^4.21.0",
         "typescript": "^6.0.2",
         "typescript-eslint": "^8.58.2"
@@ -47,6 +48,7 @@
         "dotenv": "^17.4.2",
         "express": "^5.2.1",
         "http-errors": "^2.0.1",
+        "pg": "^8.20.0",
         "reflect-metadata": "^0.2.2",
         "typeorm": "^0.3.28",
         "winston": "^3.19.0"
