@@ -19,5 +19,21 @@ describe("POST /auth/register", () => {
             //Assert
             expect(response.statusCode).toBe(201);
         });
+        it("should return json", async () => {
+            const userData = {
+                firstName: "Rekesh",
+                lastName: "K",
+                email: "rakesh@mern.space",
+                password: "secret",
+            };
+            //Act
+            const response = await request(app)
+                .post("/auth/register")
+                .send(userData);
+
+            expect(response.headers["content-type"]).toEqual(
+                expect.stringContaining("json"),
+            );
+        });
     });
 });
