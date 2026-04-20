@@ -59,6 +59,21 @@ describe("POST /auth/register", () => {
                 expect.stringContaining("json"),
             );
         });
+        it("should return id of created user", async () => {
+            const userData = {
+                firstName: "Rekesh",
+                lastName: "K",
+                email: "rakesh@mern.space",
+                password: "secret",
+            };
+
+            const response = await request(app)
+                .post("/auth/register")
+                .send(userData);
+
+            expect(response.body).toHaveProperty("id");
+            expect(typeof response.body.id).toBe("number");
+        });
         it("should persist in the database", async () => {
             const userData = {
                 firstName: "Rekesh",
