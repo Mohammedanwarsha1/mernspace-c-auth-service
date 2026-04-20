@@ -9,6 +9,7 @@ import type { HttpError } from "http-errors";
 import { error } from "node:console";
 import authRouter from "./routes/auth";
 const app = express();
+app.use(express.json());
 
 app.get("/", async (req, res) => {
     res.send("Welcome to auth service");
