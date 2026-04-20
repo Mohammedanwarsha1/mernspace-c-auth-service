@@ -27,7 +27,6 @@ export class AuthController {
                 email,
                 password,
             });
-            this.logger.info("User has been registed", { id: user.id });
             res.status(201).json({ id: user.id });
         } catch (err) {
             next(err);
