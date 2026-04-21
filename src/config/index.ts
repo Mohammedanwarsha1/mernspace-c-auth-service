@@ -3,8 +3,16 @@ import path from "path";
 config({ quiet: true });
 config({ path: path.join(__dirname, `../../.env.${process.env.NODE_ENV}`) });
 
-const { PORT, NODE_ENV, DB_HOST, DB_PORT, DB_USERNAME, DB_PASSWORD, DB_NAME } =
-    process.env;
+const {
+    PORT,
+    NODE_ENV,
+    DB_HOST,
+    DB_PORT,
+    DB_USERNAME,
+    DB_PASSWORD,
+    DB_NAME,
+    REFRESH_TOKEN_SECRET,
+} = process.env;
 
 function required(value: string | undefined, name: string): string {
     if (!value) {
@@ -22,4 +30,8 @@ export const Config = {
     DB_USERNAME: required(DB_USERNAME, "DB_USERNAME"),
     DB_PASSWORD: required(DB_PASSWORD, "DB_PASSWORD"),
     DB_NAME: required(DB_NAME, "DB_NAME"),
+    REFRESH_TOKEN_SECRET: required(
+        REFRESH_TOKEN_SECRET,
+        "REFRESH_TOKEN_SECRET",
+    ),
 };
