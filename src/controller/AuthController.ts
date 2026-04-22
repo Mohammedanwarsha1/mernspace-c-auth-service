@@ -8,11 +8,15 @@ import { sign, type JwtPayload } from "jsonwebtoken";
 import path from "path";
 import createHttpError from "http-errors";
 import { Config } from "../config";
+import { AppDataSource } from "../config/data-source";
+import { RefreshToken } from "../entity/RefreshToken";
+import type { TokenService } from "../services/TokenService";
 
 export class AuthController {
     constructor(
         private userService: UserService,
         private logger: Logger,
+        private tokenService: TokenService,
     ) {}
     async register(
         req: RegisterUserRequest,
@@ -57,16 +61,16 @@ export class AuthController {
                 role: user.role,
             };
 
-            const accessToken = sign(payload, privateKey, {
-                algorithm: "RS256",
-                expiresIn: "1h",
-                issuer: "auth-service",
-            });
+            const accessToken = this.tokenService.generateAccessToken(payload);
+            //persisit the refresh token
 
-            const refreshToken = sign(payload, Config.REFRESH_TOKEN_SECRET!, {
-                algorithm: "HS256",
-                expiresIn: "1y",
-                issuer: "auth-service",
+            const refreshTokenRepository =
+                this.tokenService.generateRefreshToken;
+            const newRefreshToken =
+                await this.tokenService.persistRefreshToken(user);
+            const refreshToken = this.tokenService.generateRefreshToken({
+                ...payload,
+                id: String(newRefreshToken.id),
             });
             res.cookie("accessToken", accessToken, {
                 domain: "localhost",

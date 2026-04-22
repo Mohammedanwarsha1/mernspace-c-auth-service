@@ -5,6 +5,8 @@ import { User } from "../src/entity/User";
 import { AppDataSource } from "../src/config/data-source";
 import { Roles } from "../src/constants";
 import { isJwt } from "./utils";
+import { RefreshToken } from "../src/entity/RefreshToken";
+import { response } from "express";
 
 describe("POST /auth/register", () => {
     let connection: DataSource;
@@ -157,9 +159,11 @@ describe("POST /auth/register", () => {
 
             cookies.forEach((cookie) => {
                 if (cookie.startsWith("accessToken=")) {
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                     accessToken = cookie.split(";")[0].split("=")[1];
                 }
                 if (cookie.startsWith("refreshToken=")) {
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                     refreshToken = cookie.split(";")[0].split("=")[1];
                 }
             });
@@ -170,7 +174,29 @@ describe("POST /auth/register", () => {
             console.log(accessToken);
             expect(isJwt(refreshToken)).toBeTruthy();
         });
+        it("Should store refresh token in the database", async () => {
+            const userData = {
+                firstName: "Rekesh",
+                lastName: "K",
+                email: "rakesh@mern.space",
+                password: "secret",
+            };
+            const response = await request(app)
+                .post("/auth/register")
+                .send(userData);
+
+            const refreshTokenRepository =
+                connection.getRepository(RefreshToken);
+            const tokens = await refreshTokenRepository
+                .createQueryBuilder("refreshToken")
+                .where("refreshToken.userId= :userId ", {
+                    userId: (response.body as Record<string, string>).id,
+                })
+                .getMany();
+            expect(tokens).toHaveLength(1);
+        });
     });
+
     describe("Feild are missing", () => {
         it("should return 400 status code ,if email missing", async () => {
             const userData = {
