@@ -29,7 +29,6 @@ export class UserService {
                 role: Roles.CUSTOMER,
             });
             return user;
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (err) {
             const error = createHttpError(
                 500,
