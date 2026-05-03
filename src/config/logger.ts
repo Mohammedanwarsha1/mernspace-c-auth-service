@@ -14,7 +14,6 @@ const logger = winston.createLogger({
                 winston.format.timestamp(),
                 winston.format.json(),
             ),
-            silent: true,
         }),
 
         new winston.transports.File({
@@ -25,7 +24,6 @@ const logger = winston.createLogger({
                 winston.format.timestamp(),
                 winston.format.json(),
             ),
-            silent: true,
         }),
 
         new winston.transports.Console({
