@@ -5,8 +5,6 @@ import express, {
 } from "express";
 import logger from "./config/logger.js";
 import type { HttpError } from "http-errors";
-
-import { error } from "node:console";
 import authRouter from "./routes/auth";
 const app = express();
 app.use(express.json());

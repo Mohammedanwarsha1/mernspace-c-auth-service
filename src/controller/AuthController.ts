@@ -1,16 +1,19 @@
-import fs from "fs";
+import fs from "node:fs";
 import type { NextFunction, Response } from "express";
 import type { RegisterUserRequest } from "../types";
 import { UserService } from "../services/UserService";
 import type { Logger } from "winston";
 import { validationResult } from "express-validator";
-import { sign, type JwtPayload } from "jsonwebtoken";
-import path from "path";
+import type { JwtPayload } from "jsonwebtoken";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import createHttpError from "http-errors";
 import { Config } from "../config";
 import { AppDataSource } from "../config/data-source";
 import { RefreshToken } from "../entity/RefreshToken";
 import type { TokenService } from "../services/TokenService";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export class AuthController {
     constructor(

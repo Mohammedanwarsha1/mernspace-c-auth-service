@@ -1,11 +1,14 @@
 import fs from "node:fs";
 import path from "node:path";
-import { type JwtPayload, sign } from "jsonwebtoken";
+import { fileURLToPath } from "node:url";
+import jwt, { type JwtPayload } from "jsonwebtoken";
 import createHttpError from "http-errors";
 import { Config } from "../config";
 import { RefreshToken } from "../entity/RefreshToken";
 import { User } from "../entity/User";
 import { Repository } from "typeorm";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export class TokenService {
     constructor(private refreshTokenRepository: Repository<RefreshToken>) {}
@@ -24,7 +27,7 @@ export class TokenService {
             throw error;
         }
 
-        const accessToken = sign(payload, privateKey, {
+        const accessToken = jwt.sign(payload, privateKey, {
             algorithm: "RS256",
             expiresIn: "1d",
             issuer: "auth-service",
@@ -34,7 +37,7 @@ export class TokenService {
     }
 
     generateRefreshToken(payload: JwtPayload) {
-        const refreshToken = sign(payload, Config.REFRESH_TOKEN_SECRET!, {
+        const refreshToken = jwt.sign(payload, Config.REFRESH_TOKEN_SECRET!, {
             algorithm: "HS256",
             expiresIn: "1y",
             issuer: "auth-service",
