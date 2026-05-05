@@ -1,92 +1,78 @@
 import request from "supertest";
 import app from "../src/app";
-import type { DataSource } from "typeorm/browser";
 import { User } from "../src/entity/User";
+import { DataSource } from "typeorm";
 import { AppDataSource } from "../src/config/data-source";
 import { Roles } from "../src/constants";
-import { isJwt } from "./utils";
+import { isJwt } from "../test/utils";
 import { RefreshToken } from "../src/entity/RefreshToken";
-import { response } from "express";
 
 describe("POST /auth/register", () => {
     let connection: DataSource;
 
     beforeAll(async () => {
-        if (!AppDataSource.isInitialized) {
-            await AppDataSource.initialize();
-        }
-        connection = AppDataSource;
+        connection = await AppDataSource.initialize();
     });
 
     beforeEach(async () => {
+        // Database truncate
         await connection.dropDatabase();
         await connection.synchronize();
     });
 
     afterAll(async () => {
-        if (connection?.isInitialized) {
-            await connection.destroy();
-        }
+        await connection.destroy();
     });
 
-    describe("Given all feilds", () => {
-        it("should return 201 status code", async () => {
-            //Arrange
-
+    describe("Given all fields", () => {
+        it("should return the 201 status code", async () => {
+            // Arrange
             const userData = {
-                firstName: "Rekesh",
+                firstName: "Rakesh",
                 lastName: "K",
                 email: "rakesh@mern.space",
-                password: "secret",
+                password: "password",
             };
-            //Act
+            // Act
             const response = await request(app)
                 .post("/auth/register")
                 .send(userData);
 
-            //Assert
+            // Assert
             expect(response.statusCode).toBe(201);
         });
-        it("should return json", async () => {
+
+        it("should return valid json response", async () => {
+            // Arrange
             const userData = {
-                firstName: "Rekesh",
+                firstName: "Rakesh",
                 lastName: "K",
                 email: "rakesh@mern.space",
-                password: "secret",
+                password: "password",
             };
-            //Act
+            // Act
             const response = await request(app)
                 .post("/auth/register")
                 .send(userData);
 
-            expect(response.headers["content-type"]).toEqual(
-                expect.stringContaining("json"),
-            );
+            // Assert application/json utf-8
+            expect(
+                (response.headers as Record<string, string>)?.["content-type"],
+            ).toEqual(expect.stringContaining("json"));
         });
-        it("should return id of created user", async () => {
+
+        it("should persist the user in the database", async () => {
+            // Arrange
             const userData = {
-                firstName: "Rekesh",
+                firstName: "Rakesh",
                 lastName: "K",
                 email: "rakesh@mern.space",
-                password: "secret",
+                password: "password",
             };
-
-            const response = await request(app)
-                .post("/auth/register")
-                .send(userData);
-
-            expect(response.body).toHaveProperty("id");
-            expect(typeof response.body.id).toBe("number");
-        });
-        it("should persist in the database", async () => {
-            const userData = {
-                firstName: "Rekesh",
-                lastName: "K",
-                email: "rakesh@mern.space",
-                password: "secret",
-            };
+            // Act
             await request(app).post("/auth/register").send(userData);
 
+            // Assert
             const userRepository = connection.getRepository(User);
             const users = await userRepository.find();
             expect(users).toHaveLength(1);
@@ -94,152 +80,317 @@ describe("POST /auth/register", () => {
             expect(users[0]?.lastName).toBe(userData.lastName);
             expect(users[0]?.email).toBe(userData.email);
         });
-        it("should assign a customer role", async () => {
+
+        it("should return an id of the created user", async () => {
+            // Arrange
             const userData = {
-                firstName: "Rekesh",
+                firstName: "Rakesh",
                 lastName: "K",
                 email: "rakesh@mern.space",
-                password: "secret",
+                password: "password",
             };
+            // Act
+            const response = await request(app)
+                .post("/auth/register")
+                .send(userData);
+
+            // Assert
+            expect(response.body).toHaveProperty("id");
+            const repository = connection.getRepository(User);
+            const users = await repository.find();
+            expect((response.body as Record<string, string>)?.id).toBe(
+                users[0]?.id,
+            );
+        });
+
+        it("should assign a customer role", async () => {
+            // Arrange
+            const userData = {
+                firstName: "Rakesh",
+                lastName: "K",
+                email: "rakesh@mern.space",
+                password: "password",
+            };
+            // Act
             await request(app).post("/auth/register").send(userData);
+
+            // Assert
             const userRepository = connection.getRepository(User);
             const users = await userRepository.find();
             expect(users[0]).toHaveProperty("role");
             expect(users[0]?.role).toBe(Roles.CUSTOMER);
         });
-        it("should assign hashed password to DB", async () => {
+
+        it("should store the hashed password in the database", async () => {
+            // Arrange
             const userData = {
-                firstName: "Rekesh",
+                firstName: "Rakesh",
                 lastName: "K",
                 email: "rakesh@mern.space",
-                password: "secret",
+                password: "password",
             };
+            // Act
             await request(app).post("/auth/register").send(userData);
+
+            // Assert
             const userRepository = connection.getRepository(User);
-            const users = await userRepository.find();
+            const users = await userRepository.find({ select: ["password"] });
             expect(users[0]?.password).not.toBe(userData.password);
             expect(users[0]?.password).toHaveLength(60);
             expect(users[0]?.password).toMatch(/^\$2[a|b]\$\d+\$/);
         });
-        it("should return 400 status code if email already exist", async () => {
+
+        it("should return 400 status code if email is already exists", async () => {
+            // Arrange
             const userData = {
-                firstName: "Rekesh",
+                firstName: "Rakesh",
                 lastName: "K",
                 email: "rakesh@mern.space",
-                password: "secret",
+                password: "password",
             };
             const userRepository = connection.getRepository(User);
             await userRepository.save({ ...userData, role: Roles.CUSTOMER });
+
+            // Act
             const response = await request(app)
                 .post("/auth/register")
                 .send(userData);
 
             const users = await userRepository.find();
+            // Assert
             expect(response.statusCode).toBe(400);
             expect(users).toHaveLength(1);
         });
+
         it("should return the access token and refresh token inside a cookie", async () => {
+            // Arrange
             const userData = {
-                firstName: "Rekesh",
+                firstName: "Rakesh",
                 lastName: "K",
                 email: "rakesh@mern.space",
-                password: "secret",
+                password: "password",
             };
+
+            // Act
             const response = await request(app)
                 .post("/auth/register")
                 .send(userData);
+
+            interface Headers {
+                ["set-cookie"]?: string[];
+            }
+            // Assert
             let accessToken = null;
             let refreshToken = null;
-            const setCookieHeader = response.headers["set-cookie"];
-            const cookies = Array.isArray(setCookieHeader)
-                ? setCookieHeader
-                : setCookieHeader
-                  ? [setCookieHeader]
-                  : [];
-
+            const cookies =
+                (response.headers as unknown as Partial<Headers>)[
+                    "set-cookie"
+                ] || [];
+            // accessToken=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNjkzOTA5Mjc2LCJleHAiOjE2OTM5MDkzMzYsImlzcyI6Im1lcm5zcGFjZSJ9.KetQMEzY36vxhO6WKwSR-P_feRU1yI-nJtp6RhCEZQTPlQlmVsNTP7mO-qfCdBr0gszxHi9Jd1mqf-hGhfiK8BRA_Zy2CH9xpPTBud_luqLMvfPiz3gYR24jPjDxfZJscdhE_AIL6Uv2fxCKvLba17X0WbefJSy4rtx3ZyLkbnnbelIqu5J5_7lz4aIkHjt-rb_sBaoQ0l8wE5KzyDNy7mGUf7cI_yR8D8VlO7x9llbhvCHF8ts6YSBRBt_e2Mjg5txtfBaDq5auCTXQ2lmnJtMb75t1nAFu8KwQPrDYmwtGZDkHUcpQhlP7R-y3H99YnrWpXbP8Zr_oO67hWnoCSw; Max-Age=43200; Domain=localhost; Path=/; Expires=Tue, 05 Sep 2023 22:21:16 GMT; HttpOnly; SameSite=Strict
             cookies.forEach((cookie) => {
-                if (cookie.startsWith("accessToken=")) {
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                    accessToken = cookie.split(";")[0].split("=")[1];
+                if (cookie?.startsWith("accessToken=")) {
+                    const tokenPart = cookie.split(";")[0]?.split("=")[1];
+                    if (tokenPart) {
+                        accessToken = tokenPart;
+                    }
                 }
-                if (cookie.startsWith("refreshToken=")) {
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                    refreshToken = cookie.split(";")[0].split("=")[1];
+
+                if (cookie?.startsWith("refreshToken=")) {
+                    const tokenPart = cookie.split(";")[0]?.split("=")[1];
+                    if (tokenPart) {
+                        refreshToken = tokenPart;
+                    }
                 }
             });
             expect(accessToken).not.toBeNull();
             expect(refreshToken).not.toBeNull();
 
             expect(isJwt(accessToken)).toBeTruthy();
-            console.log(accessToken);
             expect(isJwt(refreshToken)).toBeTruthy();
         });
-        it("Should store refresh token in the database", async () => {
+        it("should store the refresh token in the database", async () => {
+            // Arrange
             const userData = {
-                firstName: "Rekesh",
+                firstName: "Rakesh",
                 lastName: "K",
                 email: "rakesh@mern.space",
-                password: "secret",
+                password: "password",
             };
+
+            // Act
             const response = await request(app)
                 .post("/auth/register")
                 .send(userData);
 
-            const refreshTokenRepository =
-                connection.getRepository(RefreshToken);
-            const tokens = await refreshTokenRepository
+            // Assert
+            const refreshTokenRepo = connection.getRepository(RefreshToken);
+            // const refreshTokens = await refreshTokenRepo.find();
+
+            const tokens = await refreshTokenRepo
                 .createQueryBuilder("refreshToken")
-                .where("refreshToken.userId= :userId ", {
-                    userId: (response.body as Record<string, string>).id,
+                .where("refreshToken.userId = :userId", {
+                    userId: (response.body as Record<string, string>)?.id,
                 })
                 .getMany();
+
             expect(tokens).toHaveLength(1);
         });
     });
-
-    describe("Feild are missing", () => {
-        it("should return 400 status code ,if email missing", async () => {
+    describe("Fields are missing", () => {
+        it("should return 400 status code if email field is missing", async () => {
+            // Arrange
             const userData = {
-                firstName: "Rekesh",
+                firstName: "Rakesh",
                 lastName: "K",
                 email: "",
-                password: "secret",
+                password: "password",
             };
+            // Act
             const response = await request(app)
                 .post("/auth/register")
                 .send(userData);
 
-            console.log(response.body);
+            // Assert
+            expect(response.statusCode).toBe(400);
             const userRepository = connection.getRepository(User);
             const users = await userRepository.find();
             expect(users).toHaveLength(0);
         });
-        it("should return 400 status code ,if first name is missing", async () => {
+
+        it("should return 400 status code if firstName is missing", async () => {
+            // Arrange
             const userData = {
                 firstName: "",
                 lastName: "K",
-                email: "anwar@gmail.com",
-                password: "secret",
+                email: "rakesh@mern.space",
+                password: "password",
             };
+            // Act
             const response = await request(app)
                 .post("/auth/register")
                 .send(userData);
+
+            // Assert
             expect(response.statusCode).toBe(400);
+            const userRepository = connection.getRepository(User);
+            const users = await userRepository.find();
+            expect(users).toHaveLength(0);
+        });
+        it("should return 400 status code if lastName is missing", async () => {
+            // Arrange
+            const userData = {
+                firstName: "Rakesh",
+                lastName: "",
+                email: "rakesh@mern.space",
+                password: "password",
+            };
+            // Act
+            const response = await request(app)
+                .post("/auth/register")
+                .send(userData);
+
+            // Assert
+            expect(response.statusCode).toBe(400);
+            const userRepository = connection.getRepository(User);
+            const users = await userRepository.find();
+            expect(users).toHaveLength(0);
+        });
+
+        it("should return 400 status code if password is missing", async () => {
+            // Arrange
+            const userData = {
+                firstName: "Rakesh",
+                lastName: "K",
+                email: "rakesh@mern.space",
+                password: "",
+            };
+            // Act
+            const response = await request(app)
+                .post("/auth/register")
+                .send(userData);
+
+            // Assert
+            expect(response.statusCode).toBe(400);
+            const userRepository = connection.getRepository(User);
+            const users = await userRepository.find();
+            expect(users).toHaveLength(0);
         });
     });
-    describe("Feilds are not in proper format", () => {
+
+    describe("Fields are not in proper format", () => {
         it("should trim the email field", async () => {
+            // Arrange
             const userData = {
-                firstName: "Rekesh",
+                firstName: "Rakesh",
                 lastName: "K",
-                email: " mohammedanwarsha2019@gmail.com ",
-                password: "secret",
+                email: " rakesh@mern.space ",
+                password: "password",
             };
+            // Act
             await request(app).post("/auth/register").send(userData);
+
+            // Assert
             const userRepository = connection.getRepository(User);
             const users = await userRepository.find();
             const user = users[0];
-            expect(user?.email).toBe("mohammedanwarsha2019@gmail.com");
+            expect(user?.email).toBe("rakesh@mern.space");
+        });
+        it("should return 400 status code if email is not a valid email", async () => {
+            // Arrange
+            const userData = {
+                firstName: "Rakesh",
+                lastName: "K",
+                email: "rakesh_mern.space", // Invalid email
+                password: "password",
+            };
+            // Act
+            const response = await request(app)
+                .post("/auth/register")
+                .send(userData);
+
+            // Assert
+            expect(response.statusCode).toBe(400);
+            const userRepository = connection.getRepository(User);
+            const users = await userRepository.find();
+            expect(users).toHaveLength(0);
+        });
+        it("should return 400 status code if password length is less than 8 chars", async () => {
+            // Arrange
+            const userData = {
+                firstName: "Rakesh",
+                lastName: "K",
+                email: "rakesh@mern.space",
+                password: "pass", // less than 8 chars
+            };
+            // Act
+            const response = await request(app)
+                .post("/auth/register")
+                .send(userData);
+
+            // Assert
+            expect(response.statusCode).toBe(400);
+            const userRepository = connection.getRepository(User);
+            const users = await userRepository.find();
+            expect(users).toHaveLength(0);
+        });
+        it("shoud return an array of error messages if email is missing", async () => {
+            // Arrange
+            const userData = {
+                firstName: "Rakesh",
+                lastName: "K",
+                email: "",
+                password: "password",
+            };
+            // Act
+            const response = await request(app)
+                .post("/auth/register")
+                .send(userData);
+
+            // Assert
+            expect(response.body).toHaveProperty("errors");
+            expect(
+                (response.body as { errors?: unknown[] })?.errors?.length,
+            ).toBeGreaterThan(0);
         });
     });
 });

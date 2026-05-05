@@ -1,14 +1,11 @@
 import fs from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 import jwt, { type JwtPayload } from "jsonwebtoken";
 import createHttpError from "http-errors";
 import { Config } from "../config";
 import { RefreshToken } from "../entity/RefreshToken";
 import { User } from "../entity/User";
 import { Repository } from "typeorm";
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export class TokenService {
     constructor(private refreshTokenRepository: Repository<RefreshToken>) {}
@@ -17,7 +14,7 @@ export class TokenService {
 
         try {
             privateKey = fs.readFileSync(
-                path.join(__dirname, "../../certs/private.pem"),
+                path.join(process.cwd(), "certs/private.pem"),
             );
         } catch (err) {
             const error = createHttpError(

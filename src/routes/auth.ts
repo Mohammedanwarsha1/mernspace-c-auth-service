@@ -1,6 +1,7 @@
 import express, {
     type NextFunction,
     type Request,
+    type RequestHandler,
     type Response,
 } from "express";
 import { AuthController } from "../controller/AuthController";
@@ -13,6 +14,8 @@ import { TokenService } from "../services/TokenService";
 import { RefreshToken } from "../entity/RefreshToken";
 import loginValidator from "../validators/login-validators";
 import { CredentialService } from "../services/CredentialService";
+import type { AuthRequest, RegisterUserRequest } from "../types";
+import autheticate from "../middlewares/autheticate";
 
 const router = express.Router();
 const userRepository = AppDataSource.getRepository(User);
@@ -32,7 +35,11 @@ router.post(
     registerValidators,
     async (req: Request, res: Response, next: NextFunction) => {
         try {
-            await authController.register(req, res, next);
+            await authController.register(
+                req as RegisterUserRequest,
+                res,
+                next,
+            );
         } catch (error) {
             next(error);
         }
@@ -43,7 +50,19 @@ router.post(
     loginValidator,
     async (req: Request, res: Response, next: NextFunction) => {
         try {
-            await authController.login(req, res, next);
+            await authController.login(req as RegisterUserRequest, res, next);
+        } catch (error) {
+            next(error);
+        }
+    },
+);
+
+router.get(
+    "/self",
+    autheticate as RequestHandler,
+    async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            await authController.self(req as AuthRequest, res);
         } catch (error) {
             next(error);
         }

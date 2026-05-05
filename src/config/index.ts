@@ -1,11 +1,8 @@
 import { config } from "dotenv";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 config({ quiet: true });
-config({ path: path.join(__dirname, `../../.env.${process.env.NODE_ENV}`) });
+config({ path: path.join(process.cwd(), `.env.${process.env.NODE_ENV}`) });
 
 const {
     PORT,
@@ -16,6 +13,7 @@ const {
     DB_PASSWORD,
     DB_NAME,
     REFRESH_TOKEN_SECRET,
+    JWKS_URI,
 } = process.env;
 
 function required(value: string | undefined, name: string): string {
@@ -38,4 +36,5 @@ export const Config = {
         REFRESH_TOKEN_SECRET,
         "REFRESH_TOKEN_SECRET",
     ),
+    JWKS_URI: required(JWKS_URI, "JWKS_URI"),
 };

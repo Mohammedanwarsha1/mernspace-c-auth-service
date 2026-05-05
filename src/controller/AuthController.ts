@@ -1,20 +1,17 @@
 import fs from "node:fs";
-import type { NextFunction, Response } from "express";
-import type { RegisterUserRequest } from "../types";
+import type { NextFunction, Response, Request } from "express";
+import type { AuthRequest, RegisterUserRequest } from "../types";
 import { UserService } from "../services/UserService";
 import type { Logger } from "winston";
 import { validationResult } from "express-validator";
 import type { JwtPayload } from "jsonwebtoken";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 import createHttpError from "http-errors";
 import { Config } from "../config";
 import { AppDataSource } from "../config/data-source";
 import { RefreshToken } from "../entity/RefreshToken";
 import type { TokenService } from "../services/TokenService";
 import type { CredentialService } from "../services/CredentialService";
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export class AuthController {
     constructor(
@@ -51,7 +48,7 @@ export class AuthController {
             let privateKey: Buffer;
             try {
                 privateKey = fs.readFileSync(
-                    path.join(__dirname, "../../certs/private.pem"),
+                    path.join(process.cwd(), "certs/private.pem"),
                 );
             } catch (err) {
                 const error = createHttpError(
@@ -173,5 +170,11 @@ export class AuthController {
             next(err);
             return;
         }
+    }
+    async self(req: AuthRequest, res: Response) {
+        //token req.auth.id
+        const user = await this.userService.findById(Number(req.auth.sub));
+        res.json({ ...user, password: undefined }); //password exculde in respose for
+        //Securitty purpose
     }
 }

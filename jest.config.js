@@ -1,7 +1,9 @@
 /** @type {import('jest').Config} */
 export default {
+    preset: "ts-jest/presets/default-esm",
     testEnvironment: "node",
     verbose: true,
+    maxWorkers: 1,
     extensionsToTreatAsEsm: [".ts"],
     watchPathIgnorePatterns: [
         "<rootDir>/.git/",
@@ -11,6 +13,7 @@ export default {
     modulePathIgnorePatterns: ["<rootDir>/.git/", "<rootDir>/dist/"],
     testMatch: ["**/__tests__/**/*.test.ts", "**/?(*.)+(spec|test).ts"],
     moduleNameMapper: {
+        "^jwks-rsa$": "<rootDir>/test/mocks/jwks-rsa.ts",
         "^(\\.{1,2}/.*)\\.js$": "$1",
     },
     transform: {
