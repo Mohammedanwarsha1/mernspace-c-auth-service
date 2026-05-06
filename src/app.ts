@@ -4,10 +4,22 @@ import express, {
     type Response,
 } from "express";
 import cookieParser from "cookie-parser";
+import path from "node:path";
 import logger from "./config/logger.js";
 import type { HttpError } from "http-errors";
 import authRouter from "./routes/auth";
+
 const app = express();
+
+// Serve .well-known directory for JWKS
+const publicDir = path.resolve(process.cwd(), "public");
+app.use(
+    "/.well-known",
+    express.static(path.join(publicDir, ".well-known"), {
+        dotfiles: "allow",
+    }),
+);
+app.use(express.static(publicDir));
 app.use(express.json());
 app.use(cookieParser());
 
@@ -21,7 +33,8 @@ app.use("/auth", authRouter);
 
 app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {
     logger.error(err.message);
-    const statusCode = err.statusCode || 500;
+    console.log(err);
+    const statusCode = err.statusCode || err.status || 500;
 
     res.status(statusCode).json({
         errors: [
