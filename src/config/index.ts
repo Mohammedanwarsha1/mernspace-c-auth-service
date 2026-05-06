@@ -1,8 +1,10 @@
 import { config } from "dotenv";
 import path from "node:path";
 
+const env = process.env.NODE_ENV ?? "dev";
 config({ quiet: true });
-config({ path: path.join(process.cwd(), `.env.${process.env.NODE_ENV}`) });
+config({ path: path.join(process.cwd(), `.env.${env}`) });
+process.env.NODE_ENV = env;
 
 const {
     PORT,

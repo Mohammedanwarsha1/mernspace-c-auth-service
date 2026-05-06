@@ -1,7 +1,6 @@
 {
     "name": "auth-service",
     "version": "1.0.0",
-    "type": "module",
     "description": "The user management service",
     "main": "index.js",
     "scripts": {
@@ -11,7 +10,10 @@
         "lint:check": "eslint .",
         "lint:fix": "eslint . --fix",
         "test": "jest --watch",
-        "prepare": "husky"
+        "prepare": "husky",
+        "migration:generate": "typeorm-ts-node-commonjs migration:generate",
+        "migration:run": "typeorm-ts-node-commonjs migration:run",
+        "migration:create": "typeorm-ts-node-commonjs migration:create"
     },
     "author": "Anwar shah <mohammedanwarsha2019@gmail.com>",
     "license": "ISC",
