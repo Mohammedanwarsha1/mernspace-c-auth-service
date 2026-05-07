@@ -43,6 +43,11 @@ describe("POST /tenants", () => {
             .post("/tenant")
             .set("Cookie", [`accessToken=${adminToken}`])
             .send(tenantdata);
-        expect(response.statusCode).toBe(201);
+
+        const tenantRepository = connection.getRepository(Tenant);
+        const tenant = await tenantRepository.find();
+        expect(tenant).toHaveLength(1);
+        expect(tenant[0]?.name).toBe(tenantdata.name);
+        expect(tenant[0]?.address).toBe(tenantdata.address);
     });
 });
