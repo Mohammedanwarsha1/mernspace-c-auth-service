@@ -28,7 +28,7 @@ app.get("/", async (req, res) => {
 });
 
 app.use("/auth", authRouter);
-app.use("/tenant", tenantRouter);
+app.use("/tenants", tenantRouter);
 
 // Global Error Handler
 
