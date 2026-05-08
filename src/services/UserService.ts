@@ -1,6 +1,6 @@
 import type { Repository } from "typeorm";
 import { User } from "../entity/User";
-import type { UserData } from "../types";
+import type { LimitedUserData, UserData } from "../types";
 import createHttpError from "http-errors";
 import { Roles } from "../constants";
 import bcrypt from "bcrypt";
@@ -54,5 +54,23 @@ export class UserService {
     }
     async deleteById(userId: number) {
         return await this.userRepository.delete(userId);
+    }
+    async update(
+        userId: number,
+        { firstName, lastName, role }: LimitedUserData,
+    ) {
+        try {
+            return await this.userRepository.update(userId, {
+                firstName,
+                lastName,
+                role,
+            });
+        } catch (err) {
+            const error = createHttpError(
+                500,
+                "Failed to update the user in the database",
+            );
+            throw error;
+        }
     }
 }
