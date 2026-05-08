@@ -49,7 +49,14 @@ router.patch(
 );
 router.get("/", async (req: Request, res: Response, next: NextFunction) => {
     try {
-        await tenantController.getAll(req, res, next);
+        await tenantController.getAll(req as CreateTenantRequest, res, next);
+    } catch (error) {
+        next(error);
+    }
+});
+router.get("/:id", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        await tenantController.getOne(req as CreateTenantRequest, res, next);
     } catch (error) {
         next(error);
     }
