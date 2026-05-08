@@ -46,8 +46,27 @@ export class TenantController {
         try {
             const tenants = await this.tenantService.getAll();
             this.logger.info("All tenant has been fetched");
+            res.json(tenants);
         } catch (err) {
             next(err);
+        }
+    }
+    async getOne(req: CreateTenantRequest, res: Response, next: NextFunction) {
+        const tenantId = Number(req.params.id);
+        if (isNaN(Number(tenantId))) {
+            next(createHttpError(400, "Invalid url params"));
+            return;
+        }
+        try {
+            const tenant = await this.tenantService.getById(tenantId);
+            if (!tenant) {
+                next(createHttpError(400, "Tenant id does not exits."));
+                return;
+            }
+            this.logger.info("Get the Tenant with the id", { id: tenantId });
+            res.send(tenant);
+        } catch (error) {
+            next(error);
         }
     }
 }
