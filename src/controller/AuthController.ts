@@ -12,6 +12,7 @@ import { AppDataSource } from "../config/data-source";
 import { RefreshToken } from "../entity/RefreshToken";
 import type { TokenService } from "../services/TokenService";
 import type { CredentialService } from "../services/CredentialService";
+import { Roles } from "../constants";
 
 export class AuthController {
     constructor(
@@ -44,6 +45,7 @@ export class AuthController {
                 lastName,
                 email,
                 password,
+                role: Roles.CUSTOMER,
             });
             let privateKey: Buffer;
             try {

@@ -9,6 +9,7 @@ import logger from "./config/logger.js";
 import type { HttpError } from "http-errors";
 import authRouter from "./routes/auth";
 import tenantRouter from "./routes/tenant";
+import userRouter from "./routes/user";
 const app = express();
 
 // Serve .well-known directory for JWKS
@@ -29,6 +30,7 @@ app.get("/", async (req, res) => {
 
 app.use("/auth", authRouter);
 app.use("/tenants", tenantRouter);
+app.use("/users", userRouter);
 
 // Global Error Handler
 
