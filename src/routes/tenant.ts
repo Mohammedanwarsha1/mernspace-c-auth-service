@@ -31,5 +31,27 @@ router.post(
         }
     },
 );
-
+router.patch(
+    "/:id",
+    authenticate,
+    canAccess([Roles.ADMIN]),
+    async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            await tenantController.update(
+                req as CreateTenantRequest,
+                res,
+                next,
+            );
+        } catch (error) {
+            next(error);
+        }
+    },
+);
+router.get("/", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        await tenantController.getAll(req, res, next);
+    } catch (error) {
+        next(error);
+    }
+});
 export default router;
