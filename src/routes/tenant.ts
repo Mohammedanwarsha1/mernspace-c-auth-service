@@ -9,6 +9,7 @@ import type { NextFunction, Request, RequestHandler, Response } from "express";
 import type { CreateTenantRequest } from "../types";
 import { Roles } from "../constants";
 import { canAccess } from "../middlewares/canAccess";
+import tenantValidator from "../validators/tenant-validator";
 
 const router = express.Router();
 const tenantRepository = AppDataSource.getRepository(Tenant);
@@ -17,15 +18,12 @@ const tenantController = new TenantController(tenantService, logger);
 
 router.post(
     "/",
-    authenticate as RequestHandler,
+    authenticate,
     canAccess([Roles.ADMIN]),
-    async (req: Request, res: Response, next: NextFunction) => {
+    tenantValidator,
+    async (req: CreateTenantRequest, res: Response, next: NextFunction) => {
         try {
-            await tenantController.create(
-                req as CreateTenantRequest,
-                res,
-                next,
-            );
+            await tenantController.create(req, res, next);
         } catch (error) {
             next(error);
         }
@@ -35,30 +33,33 @@ router.patch(
     "/:id",
     authenticate,
     canAccess([Roles.ADMIN]),
-    async (req: Request, res: Response, next: NextFunction) => {
+    tenantValidator,
+    async (req: CreateTenantRequest, res: Response, next: NextFunction) => {
         try {
-            await tenantController.update(
-                req as CreateTenantRequest,
-                res,
-                next,
-            );
+            await tenantController.update(req, res, next);
         } catch (error) {
             next(error);
         }
     },
 );
-router.get("/", async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        await tenantController.getAll(req as CreateTenantRequest, res, next);
-    } catch (error) {
-        next(error);
-    }
-});
-router.get("/:id", async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        await tenantController.getOne(req as CreateTenantRequest, res, next);
-    } catch (error) {
-        next(error);
-    }
-});
+router.get(
+    "/",
+    async (req: CreateTenantRequest, res: Response, next: NextFunction) => {
+        try {
+            await tenantController.getAll(req, res, next);
+        } catch (error) {
+            next(error);
+        }
+    },
+);
+router.get(
+    "/:id",
+    async (req: CreateTenantRequest, res: Response, next: NextFunction) => {
+        try {
+            await tenantController.getOne(req, res, next);
+        } catch (error) {
+            next(error);
+        }
+    },
+);
 export default router;
