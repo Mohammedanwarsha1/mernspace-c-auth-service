@@ -1,8 +1,6 @@
 import "reflect-metadata";
 import { DataSource } from "typeorm";
-import { User } from "../entity/User";
 import { Config } from ".";
-import { RefreshToken } from "../entity/RefreshToken";
 
 export const AppDataSource = new DataSource({
     type: "postgres",
@@ -13,7 +11,7 @@ export const AppDataSource = new DataSource({
     database: Config.DB_NAME,
     synchronize: true,
     logging: false,
-    entities: ["src/entity/*.{ts,js}"],
+    entities: ["src/entity/*.{ts,js}"], //{ts,js} this is because after build there is no ts file
     migrations: ["src/migration/*.{ts,js}"],
     subscribers: [],
 });
