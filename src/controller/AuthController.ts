@@ -111,7 +111,7 @@ export class AuthController {
         //Return respose (id)
 
         try {
-            const user = await this.userService.findbyEmail(email);
+            const user = await this.userService.findbyEmailWithPassword(email);
             if (!user) {
                 const error = createHttpError(
                     400,

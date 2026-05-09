@@ -46,11 +46,19 @@ export class UserService {
         }
     }
 
-    async findbyEmail(email: string) {
+    async findbyEmailWithPassword(email: string) {
         return await this.userRepository.findOne({
             where: {
                 email,
             },
+            select: [
+                "id",
+                "firstName",
+                "lastName",
+                "email",
+                "password",
+                "role",
+            ],
         });
     }
     async findById(id: number) {
@@ -58,6 +66,14 @@ export class UserService {
             where: {
                 id,
             },
+            select: [
+                "id",
+                "firstName",
+                "lastName",
+                "email",
+                "password",
+                "role",
+            ],
         });
     }
     async deleteById(userId: number) {
@@ -80,5 +96,8 @@ export class UserService {
             );
             throw error;
         }
+    }
+    async getAll() {
+        return await this.userRepository.find();
     }
 }

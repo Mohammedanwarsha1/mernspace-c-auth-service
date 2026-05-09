@@ -49,5 +49,12 @@ router.delete(
     canAccess([Roles.ADMIN]),
     (req, res, next) => userController.destroy(req, res, next),
 );
-
+router.get(
+    "/",
+    authenticate as RequestHandler,
+    canAccess([Roles.ADMIN]),
+    (req, res, next) => {
+        userController.getAll(req, res, next);
+    },
+);
 export default router;
