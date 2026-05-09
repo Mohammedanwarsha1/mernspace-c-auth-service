@@ -18,7 +18,11 @@ export class UserController {
             return res.status(400).json({ errors: result.array() });
         }
 
-        const { firstName, lastName, email, password } = req.body;
+        const { firstName, lastName, email, password, tenantId } = req.body;
+
+        if (tenantId === undefined) {
+            return next(createHttpError(400, "tenantId is required."));
+        }
 
         this.logger.debug("Request for creating a tenant", {
             firstName,
@@ -34,11 +38,12 @@ export class UserController {
                 email,
                 password,
                 role: Roles.MANAGER,
+                tenantId,
             });
-            this.logger.info("Tenat has been created", { id: user.id });
-            res.status(201).json({ id: user.id });
-        } catch (error) {
-            next(error);
+            this.logger.info("Tenat has been created", { id: Number(user.id) });
+            res.status(201).json({ id: Number(user.id) });
+        } catch (err) {
+            next(err);
         }
     }
     async destroy(req: Request, res: Response, next: NextFunction) {
