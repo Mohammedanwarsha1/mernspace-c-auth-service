@@ -3,6 +3,9 @@ export default {
     preset: "ts-jest/presets/default-esm",
     testEnvironment: "node",
     verbose: true,
+    collectCoverage: true,
+    coverageProvider: "v8",
+    collectCoverageFrom: ["src/**/*.ts", "!test/**", "!**/node_modules/**"],
     maxWorkers: 1,
     extensionsToTreatAsEsm: [".ts"],
     watchPathIgnorePatterns: [
