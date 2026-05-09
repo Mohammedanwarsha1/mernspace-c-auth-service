@@ -88,8 +88,9 @@ describe("POST /users", () => {
             expect(users[0]?.role).toBe(Roles.MANAGER);
         });
     });
-    it("should return 403,if admin user tries to create user", async () => {
-        const adminToken = jwks.token({
+    it("should return 403,if non admin user tries to create user", async () => {
+        const tenant = await createTenant(connection.getRepository(Tenant));
+        const nonAdmin = jwks.token({
             sub: "1",
             role: Roles.MANAGER,
         });
@@ -98,11 +99,11 @@ describe("POST /users", () => {
             lastName: "K",
             email: "rakesh@mern.space",
             password: "password",
-            tenantId: 1,
+            tenantId: tenant.id,
         };
         const response = await request(app)
             .post("/users")
-            .set("Cookie", [`accessToken=${adminToken}`])
+            .set("Cookie", [`accessToken=${nonAdmin}`])
             .send(userData);
 
         expect(response.statusCode).toBe(403);
