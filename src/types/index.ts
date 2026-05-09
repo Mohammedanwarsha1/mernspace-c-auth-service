@@ -1,5 +1,4 @@
 import type { Request } from "express";
-import { request } from "node:http";
 
 export interface UserData {
     firstName: string;

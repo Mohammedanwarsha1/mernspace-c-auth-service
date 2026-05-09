@@ -18,7 +18,8 @@ export class UserController {
             return res.status(400).json({ errors: result.array() });
         }
 
-        const { firstName, lastName, email, password, tenantId } = req.body;
+        const { firstName, lastName, email, password, tenantId, role } =
+            req.body;
 
         if (tenantId === undefined) {
             return next(createHttpError(400, "tenantId is required."));
@@ -37,7 +38,7 @@ export class UserController {
                 lastName,
                 email,
                 password,
-                role: Roles.MANAGER,
+                role,
                 tenantId,
             });
             this.logger.info("Tenat has been created", { id: Number(user.id) });
