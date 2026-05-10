@@ -18,6 +18,10 @@ export class TokenService {
 
         try {
             privateKey = Config.PRIVATE_KEY;
+            // Handle escaped newlines from GitHub Actions secrets
+            if (privateKey.includes("\\n")) {
+                privateKey = privateKey.replace(/\\n/g, "\n");
+            }
         } catch (err) {
             const error = createHttpError(
                 500,

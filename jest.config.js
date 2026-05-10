@@ -6,6 +6,7 @@ export default {
     collectCoverage: true,
     coverageProvider: "v8",
     collectCoverageFrom: ["src/**/*.ts", "!test/**", "!**/node_modules/**"],
+    setupFiles: ["<rootDir>/jest.setup.js"],
     maxWorkers: 1,
     extensionsToTreatAsEsm: [".ts"],
     watchPathIgnorePatterns: [
