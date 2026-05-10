@@ -5,6 +5,7 @@ import app from "../../src/app";
 import { Tenant } from "../../src/entity/Tenant";
 import createJWKSMock from "mock-jwks";
 import { Roles } from "../../src/constants";
+import { Config } from "../../src/config";
 
 describe("POST /tenants", () => {
     let connection: DataSource;
@@ -13,13 +14,14 @@ describe("POST /tenants", () => {
 
     beforeAll(async () => {
         connection = await AppDataSource.initialize();
-        jwks = createJWKSMock("http://localhost:5501");
+        const jwksHost = new URL(Config.JWKS_URI).origin;
+        jwks = createJWKSMock(jwksHost);
+        jwks.start();
     });
 
     beforeEach(async () => {
         await connection.dropDatabase();
         await connection.synchronize();
-        jwks.start();
 
         adminToken = jwks.token({
             sub: "1",
@@ -28,11 +30,8 @@ describe("POST /tenants", () => {
     });
 
     afterAll(async () => {
-        await connection.destroy();
-    });
-
-    afterEach(() => {
         jwks.stop();
+        await connection.destroy();
     });
     describe("Given all fields", () => {
         it("should return a 201 status code", async () => {
