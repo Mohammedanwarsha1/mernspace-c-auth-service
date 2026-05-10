@@ -47,19 +47,6 @@ export class AuthController {
                 password,
                 role: Roles.CUSTOMER,
             });
-            let privateKey: Buffer;
-            try {
-                privateKey = fs.readFileSync(
-                    path.join(process.cwd(), "certs/private.pem"),
-                );
-            } catch (err) {
-                const error = createHttpError(
-                    500,
-                    "Error while reading private",
-                );
-                next(error);
-                return;
-            }
             const payload: JwtPayload = {
                 sub: String(user.id),
                 role: user.role,
