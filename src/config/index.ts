@@ -16,6 +16,7 @@ const {
     DB_NAME,
     REFRESH_TOKEN_SECRET,
     JWKS_URI,
+    PRIVATE_KEY,
 } = process.env;
 
 function required(value: string | undefined, name: string): string {
@@ -39,4 +40,5 @@ export const Config = {
         "REFRESH_TOKEN_SECRET",
     ),
     JWKS_URI: required(JWKS_URI, "JWKS_URI"),
+    PRIVATE_KEY: required(PRIVATE_KEY, "PRIVATE_KEY"),
 };
