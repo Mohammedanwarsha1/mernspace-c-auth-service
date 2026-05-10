@@ -11,6 +11,7 @@ import authRouter from "./routes/auth";
 import tenantRouter from "./routes/tenant";
 import userRouter from "./routes/user";
 const app = express();
+app.disable("x-powered-by");
 
 // Serve .well-known directory for JWKS
 const publicDir = path.resolve(process.cwd(), "public");
