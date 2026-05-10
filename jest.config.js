@@ -1,4 +1,6 @@
 /** @type {import('jest').Config} */
+process.env.NODE_ENV = "test";
+
 export default {
     preset: "ts-jest/presets/default-esm",
     testEnvironment: "node",
