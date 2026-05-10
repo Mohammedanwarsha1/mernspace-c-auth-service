@@ -1,6 +1,4 @@
 /** @type {import('jest').Config} */
-process.env.NODE_ENV = "test";
-
 export default {
     preset: "ts-jest/presets/default-esm",
     testEnvironment: "node",
@@ -8,6 +6,7 @@ export default {
     collectCoverage: true,
     coverageProvider: "v8",
     collectCoverageFrom: ["src/**/*.ts", "!test/**", "!**/node_modules/**"],
+    setupFiles: ["<rootDir>/jest.setup.js"],
     maxWorkers: 1,
     extensionsToTreatAsEsm: [".ts"],
     watchPathIgnorePatterns: [
