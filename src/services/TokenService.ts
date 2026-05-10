@@ -12,16 +12,12 @@ export class TokenService {
     generateAccessToken(payload: JwtPayload) {
         let privateKey: string;
         if (!Config.PRIVATE_KEY) {
-            const error = createHttpError(500, "SECRE_KEY is not set");
+            const error = createHttpError(500, "SECRTE_KEY is not set");
             throw error;
         }
 
         try {
             privateKey = Config.PRIVATE_KEY;
-            // Handle escaped newlines from GitHub Actions secrets
-            if (privateKey.includes("\\n")) {
-                privateKey = privateKey.replace(/\\n/g, "\n");
-            }
         } catch (err) {
             const error = createHttpError(
                 500,
