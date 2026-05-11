@@ -15,9 +15,9 @@ export class TokenService {
             const error = createHttpError(500, "SECRTE_KEY is not set");
             throw error;
         }
-
         try {
-            privateKey = Config.PRIVATE_KEY;
+            // Support PEM keys passed through env files as escaped newlines.
+            privateKey = Config.PRIVATE_KEY.replace(/\\n/g, "\n").trim();
         } catch (err) {
             const error = createHttpError(
                 500,
