@@ -10,7 +10,14 @@ import type { HttpError } from "http-errors";
 import authRouter from "./routes/auth";
 import tenantRouter from "./routes/tenant";
 import userRouter from "./routes/user";
+import cors from "cors";
 const app = express();
+app.use(
+    cors({
+        origin: ["http://localhost:5173"],
+        credentials: true,
+    }),
+);
 app.disable("x-powered-by");
 
 // Serve .well-known directory for JWKS
