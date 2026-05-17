@@ -66,14 +66,9 @@ export class UserService {
             where: {
                 id,
             },
-            select: [
-                "id",
-                "firstName",
-                "lastName",
-                "email",
-                "password",
-                "role",
-            ],
+            relations: {
+                tenant: true,
+            },
         });
     }
     async deleteById(userId: number) {

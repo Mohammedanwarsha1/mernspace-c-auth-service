@@ -26,7 +26,8 @@ export class AuthController {
         res: Response,
         next: NextFunction,
     ) {
-        const { firstName, lastName, email, password } = req.body;
+        const { firstName, lastName, email, password, role, tenantId } =
+            req.body;
         //Validation
         const result = validationResult(req);
         if (!result.isEmpty()) {
@@ -45,7 +46,8 @@ export class AuthController {
                 lastName,
                 email,
                 password,
-                role: Roles.CUSTOMER,
+                role,
+                tenantId,
             });
             const payload: JwtPayload = {
                 sub: String(user.id),
