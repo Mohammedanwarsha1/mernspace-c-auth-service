@@ -2,9 +2,7 @@ import type { Repository } from "typeorm";
 import { User } from "../entity/User";
 import type { LimitedUserData, UserData } from "../types";
 import createHttpError from "http-errors";
-import { Roles } from "../constants";
 import bcrypt from "bcryptjs";
-
 export class UserService {
     constructor(private userRepository: Repository<User>) {}
 
@@ -66,14 +64,9 @@ export class UserService {
             where: {
                 id,
             },
-            select: [
-                "id",
-                "firstName",
-                "lastName",
-                "email",
-                "password",
-                "role",
-            ],
+            relations: {
+                tenant: true,
+            },
         });
     }
     async deleteById(userId: number) {
