@@ -1,4 +1,4 @@
-import type { Repository } from "typeorm";
+import { Brackets, type Repository } from "typeorm";
 import { User } from "../entity/User";
 import { Tenant } from "../entity/Tenant";
 import type { LimitedUserData, UserData, UserQueryParams } from "../types";
@@ -105,10 +105,30 @@ export class UserService {
         }
     }
     async getAll(validatedQuery: UserQueryParams) {
-        const queryBuilder = this.userRepository.createQueryBuilder();
+        const queryBuilder = this.userRepository.createQueryBuilder("u");
+        if (validatedQuery.q) {
+            const searchTerm = `%${validatedQuery.q}%`;
+            queryBuilder.where(
+                new Brackets((qb) => {
+                    //Rakesh K
+                    qb.where(
+                        'CONCAT("u"."firstName",\' \',"u"."lastName") ILIKE :q',
+                        { q: searchTerm },
+                    ).orWhere('"u"."email" ILIKE :q', {
+                        q: searchTerm,
+                    });
+                }),
+            );
+        }
+        if (validatedQuery.role) {
+            queryBuilder.andWhere('"u"."role" = :role', {
+                role: validatedQuery.role,
+            });
+        }
         const result = await queryBuilder
             .skip((validatedQuery.currentPage - 1) * validatedQuery.perPage)
             .take(validatedQuery.perPage)
+            .orderBy("u.id", "DESC")
             .getManyAndCount();
         return result;
     }
