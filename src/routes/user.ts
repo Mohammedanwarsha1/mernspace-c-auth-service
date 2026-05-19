@@ -11,6 +11,7 @@ import { UserService } from "../services/UserService";
 import { User } from "../entity/User";
 import createUserValidator from "../validators/create-user-validator";
 import updateUserValidators from "../validators/update-user-validators";
+import listUsersValidators from "../validators/list-user-validator";
 
 const router = express.Router();
 const userRepository = AppDataSource.getRepository(User);
@@ -53,7 +54,8 @@ router.get(
     "/",
     authenticate as RequestHandler,
     canAccess([Roles.ADMIN]),
-    (req, res, next) => {
+    listUsersValidators,
+    (req: Request, res: Response, next: NextFunction) => {
         userController.getAll(req, res, next);
     },
 );

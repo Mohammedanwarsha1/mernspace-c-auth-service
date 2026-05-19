@@ -46,7 +46,7 @@ export class AuthController {
                 lastName,
                 email,
                 password,
-                role,
+                role: role ?? Roles.CUSTOMER,
                 tenantId,
             });
             const payload: JwtPayload = {

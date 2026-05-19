@@ -1,6 +1,7 @@
 import type { Repository } from "typeorm";
 import { User } from "../entity/User";
-import type { LimitedUserData, UserData } from "../types";
+import { Tenant } from "../entity/Tenant";
+import type { LimitedUserData, UserData, UserQueryParams } from "../types";
 import createHttpError from "http-errors";
 import bcrypt from "bcryptjs";
 export class UserService {
@@ -20,6 +21,19 @@ export class UserService {
         if (user) {
             const err = createHttpError(400, "email is already existed");
             throw err;
+        }
+
+        if (tenantId !== undefined) {
+            const tenant = await this.userRepository.manager
+                .getRepository(Tenant)
+                .findOne({ where: { id: tenantId } });
+
+            if (!tenant) {
+                throw createHttpError(
+                    400,
+                    `tenantId ${tenantId} does not exist`,
+                );
+            }
         }
 
         //Hast the password
@@ -90,7 +104,12 @@ export class UserService {
             throw error;
         }
     }
-    async getAll() {
-        return await this.userRepository.find();
+    async getAll(validatedQuery: UserQueryParams) {
+        const queryBuilder = this.userRepository.createQueryBuilder();
+        const result = await queryBuilder
+            .skip((validatedQuery.currentPage - 1) * validatedQuery.perPage)
+            .take(validatedQuery.perPage)
+            .getManyAndCount();
+        return result;
     }
 }
