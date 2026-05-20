@@ -10,6 +10,7 @@ import type { CreateTenantRequest } from "../types";
 import { Roles } from "../constants";
 import { canAccess } from "../middlewares/canAccess";
 import tenantValidator from "../validators/tenant-validator";
+import listUserValidator from "../validators/list-user-validator";
 
 const router = express.Router();
 const tenantRepository = AppDataSource.getRepository(Tenant);
@@ -44,6 +45,7 @@ router.patch(
 );
 router.get(
     "/",
+    listUserValidator,
     async (req: CreateTenantRequest, res: Response, next: NextFunction) => {
         try {
             await tenantController.getAll(req, res, next);
