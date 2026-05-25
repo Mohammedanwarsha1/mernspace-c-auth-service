@@ -11,6 +11,7 @@ import authRouter from "./routes/auth";
 import tenantRouter from "./routes/tenant";
 import userRouter from "./routes/user";
 import cors from "cors";
+import { globalErrorHandler } from "./middlewares/globalErrorhandler.js";
 const app = express();
 app.use(
     cors({
@@ -42,21 +43,6 @@ app.use("/users", userRouter);
 
 // Global Error Handler
 
-app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {
-    logger.error(err.message);
-    console.log(err);
-    const statusCode = err.statusCode || err.status || 500;
-
-    res.status(statusCode).json({
-        errors: [
-            {
-                type: err.name,
-                msg: err.message,
-                path: "",
-                location: "",
-            },
-        ],
-    });
-});
+app.use(globalErrorHandler);
 
 export default app;
