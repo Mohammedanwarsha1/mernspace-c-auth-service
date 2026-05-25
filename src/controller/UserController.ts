@@ -76,7 +76,7 @@ export class UserController {
             return res.status(400).json({ errors: result.array() });
         }
 
-        const { firstName, lastName, role } = req.body;
+        const { firstName, lastName, role, email, tenantId } = req.body;
         const userId = req.params.id;
         this.logger.debug("Request for creating a tenant", {
             firstName,
@@ -89,6 +89,8 @@ export class UserController {
                 firstName,
                 lastName,
                 role,
+                email,
+                tenantId,
             });
             this.logger.info("Tenat has been created", { id: userId });
             res.status(201).json({ id: Number(userId) });
